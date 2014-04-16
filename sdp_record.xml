@@ -10,7 +10,7 @@
 		<sequence>
 			<sequence>
 				<uuid value="0x0100" />
-				<uint16 value="0x0037" />
+				<uint16 value="0x0011" />
 			</sequence>
 			<sequence>
 				<uuid value="0x0011" />
@@ -42,7 +42,7 @@
 			<sequence>
 				<sequence>
 					<uuid value="0x0100" />
-					<uint16 value="0x0039" />
+					<uint16 value="0x0013" />
 				</sequence>
 				<sequence>
 					<uuid value="0x0011" />

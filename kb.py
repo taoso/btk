@@ -4,6 +4,7 @@ import keymap
 import os
 
 class Keyboard:
+    fd = -1
     def __init__(self, dev_path='/dev/input/event3'):
         self.dev = ev.InputDevice(dev_path)
 
@@ -31,8 +32,8 @@ class Keyboard:
             0x00,
         ]
 
-    def register_cb(self, channel):
-        self.channel = channel
+    def register_intr_sock(self, sock):
+        self.sock = sock
         gobject.io_add_watch(self.dev, gobject.IO_IN, self.ev_cb)
 
     def update_state(self):
@@ -63,14 +64,12 @@ class Keyboard:
         if event.type == ev.ecodes.EV_KEY and event.value < 2:
             self.event = event
             self.update_state()
-            def send_event(fd, io_type):
-                bstr = self.to_bstr()
-                print('send:', self.state)
-                os.write(fd, bstr)
 
-                return False
-
-            gobject.io_add_watch(self.channel, gobject.IO_OUT, send_event)
+            print('send: ', self.state)
+            try:
+                self.sock.send(self.to_bstr())
+            except Exception as e:
+                print(e, e.message)
 
         return True
 

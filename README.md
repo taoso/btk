@@ -34,3 +34,24 @@ HIDP协议栈全文可以从蓝牙官网下载到，但是是英文的，啃吧�
 - 不支持systemd集成
 
 我希望通过开源，可以将对此项目感兴趣的朋友聚集到一起，让此方案的功能不断完善。
+
+体验方法
+========
+
+系统要求如下：
+
+- 蓝牙硬件
+- BlueZ(>=5)
+- python(>=2.7)
+- [evdev](https://pypi.python.org/pypi/evdev)
+- [dbus-python](https://pypi.python.org/pypi/dbus-python)
+- [PyBlueZ](https://pypi.python.org/pypi/PyBluez)
+- iOS或者Android设备
+
+系统准备好之后需要对源代码做少许修改。我的电脑的键盘设备节点是`/dev/input/event3`，所以我就将路径硬编码到程序中了。大家需要找到自己的键盘设备节点，然后对btk.py中的第13行做相应更改。
+
+```py
+keyboard = kb.Keyboard('/dev/input/event3')
+```
+
+启动蓝牙之后以root用户运行btk.py脚本就可以了。

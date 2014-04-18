@@ -6,6 +6,7 @@ import kb
 import os
 import bluetooth as bt
 import uuid
+import time
 
 
 mainloop = None
@@ -14,11 +15,21 @@ BUF_SIZE = 1024
 PSM_CTRL = 0x11
 PSM_INTR = 0x13
 
+HIDP_HEADER_PARAM_MASK = 0x0f
+HIDP_HEADER_TRANS_MASK = 0xf0
+
+HIDP_HSHK_ERR_UNKNOWN = 0x0e
+HIDP_HSHK_SUCCESSFUL = 0x00
+
+HIDP_TRANS_DATA = 0xa0
+HIDP_TRANS_HANDSHAKE = 0x00
+HIDP_TRANS_SET_PROTOCOL = 0x70
 
 class HIDConnection:
     ctrl_fd = -1
     intr_sock = None
     ctrl_io_id = None
+    intr_id_id = None
     kb = None
 
     def __init__(self, ctrl_fd):
@@ -30,14 +41,36 @@ class HIDConnection:
             self.ctrl_data_cb
         )
 
+    def hello(self):
+        print('------hello-------')
+        os.write(self.ctrl_fd, '\xa1\x13\x03')
+        os.write(self.ctrl_fd, '\xa1\x13\x02')
+
+        time.sleep(1)
+
     def ctrl_data_cb(self, fd, io_type):
         data = os.read(fd, BUF_SIZE)
-        if (data):
-            print("received", data)
 
+        handshake = HIDP_TRANS_HANDSHAKE
+        msg_type = data[0] & HIDP_HEADER_TRANS_MASK
+
+        if msg_type & HIDP_TRANS_SET_PROTOCOL:
+            print('set protocol')
+            handshake |= HIDP_HSHK_SUCCESSFUL
+            os.write(fd, handshake)
+            return True
+
+        if msg_type & HIDP_TRANS_DATA:
+            print('data')
+            return True
+
+        print('unknown error')
+        handshake |= HIDP_HSHK_ERR_UNKNOWN
+        os.write(fd, handshake)
         return True
 
     def register_intr_sock(self, sock):
+        self.hello()
         self.intr_sock = sock
         keyboard.register_intr_sock(self.intr_sock)
 

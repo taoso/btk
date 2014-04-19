@@ -65,7 +65,6 @@ class Keyboard:
             self.event = event
             self.update_state()
 
-            print('send: ', self.state)
             try:
                 self.sock.send(self.to_bstr())
             except Exception as e:

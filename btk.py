@@ -122,7 +122,14 @@ def main():
 
     sock = bt.BluetoothSocket(bt.L2CAP)
     sock.setblocking(False)
-    sock.bind(('', PSM_INTR))
+    try:
+        sock.bind(('', PSM_INTR))
+    except:
+        print("Someone has the bluetooth HID socket open, it might be bluetoothd")
+        print("For bluez5 add --noplugin=input to the bluetoothd commandline")
+        print("For bluez4 add PluginsDisable=input to /etc/bluetooth/main.conf")
+        print("Else there is another application running that has it open.")
+        sys.exit(errno.EACCES)
     sock.listen(1)
 
     profile = HIDProfile(bus, obj_path, sock)

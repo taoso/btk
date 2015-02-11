@@ -7,10 +7,11 @@ import os
 import bluetooth as bt
 import uuid
 import time
+import glob
 
 
 mainloop = None
-keyboard = kb.Keyboard('/dev/input/event3')
+keyboard = kb.Keyboard(glob.glob('/dev/input/by-id/usb*event-kbd')[0])
 BUF_SIZE = 1024
 PSM_CTRL = 0x11
 PSM_INTR = 0x13

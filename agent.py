@@ -3,6 +3,8 @@ import dbus
 import dbus.service
 import dbus.mainloop.glib
 import gobject
+import evdev as ev
+import glob
 
 BUS_NAME = 'org.bluez'
 AGENT_INTERFACE = 'org.bluez.Agent1'
@@ -54,8 +56,23 @@ class Agent(dbus.service.Object):
                          in_signature="o", out_signature="u")
     def RequestPasskey(self, device):
         print("RequestPasskey (%s)" % (device))
+        passkey = ""
+        kb = ev.InputDevice(glob.glob('/dev/input/by-id/usb*event-kbd')[0])
+        print(kb)
+        for event in kb.read_loop():
+            data = ev.categorize(event)
+            if event.type != ev.ecodes.EV_KEY:
+                continue
+            elif data.keystate == 0: # ignore keyup
+                continue
+
+            key = ev.ecodes.KEY[event.code][4:]
+            if key == 'ENTER': # we are done
+                break
+            elif key in ['1','2','3','4','5','6','7','8','9','0']:
+                passkey = passkey + key
+
         set_trusted(device)
-        passkey = ask("Enter passkey: ")
         return dbus.UInt32(passkey)
 
     @dbus.service.method(AGENT_INTERFACE,
@@ -104,7 +121,7 @@ if __name__ == '__main__':
     props.Set("org.bluez.Adapter1", "Discoverable", dbus.Boolean(True))
 
 
-    capability = "KeyboardDisplay"
+    capability = "KeyboardOnly"
     path = "/test/agent"
     agent = Agent(bus, path)
     obj = bus.get_object('org.bluez', "/org/bluez");

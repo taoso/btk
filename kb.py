@@ -2,6 +2,8 @@ import gobject
 import evdev as ev
 import keymap
 import os
+from IPython import embed
+import bluetooth as bt
 
 class Keyboard:
     fd = -1
@@ -61,12 +63,23 @@ class Keyboard:
 
     def ev_cb(self, dev, io_type):
         event = dev.read_one()
+        
+        if event.__class__ != ev.events.InputEvent:
+            embed()
+
         if event.type == ev.ecodes.EV_KEY and event.value < 2:
             self.event = event
             self.update_state()
 
             try:
                 self.sock.send(self.to_bstr())
+            except bt.BluetoothError as e:
+                if 'Connection reset by peer' in e.message:
+                    print 'We lost our host!!!'
+                elif 'Transport endpoint is not connected' in e.message:
+                    print 'We should reconnect!!!'
+                else:
+                    print(e, e.message)
             except Exception as e:
                 print(e, e.message)
 

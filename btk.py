@@ -8,6 +8,7 @@ import bluetooth as bt
 import uuid
 import time
 import glob
+from IPython import embed
 
 
 mainloop = None
@@ -50,9 +51,22 @@ class HIDConnection:
         time.sleep(1)
 
     def ctrl_data_cb(self, fd, io_type):
+        print 'type: ' + str(io_type)
         data = os.read(fd, BUF_SIZE)
-
+        if len(data) == 0:
+            print('someone disconnected')
+            # I get this when we disconnect
+            return False
+        
         handshake = HIDP_TRANS_HANDSHAKE
+        if data.__class__ == str:
+            print 'Received' + data.__repr__()
+            if data[0] == '\x03':
+                print('set protocol')
+                handshake |= HIDP_HSHK_SUCCESSFUL
+                os.write(fd, str(handshake))
+                return True
+                
         msg_type = data[0] & HIDP_HEADER_TRANS_MASK
 
         if msg_type & HIDP_TRANS_SET_PROTOCOL:

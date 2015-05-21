@@ -2,10 +2,7 @@ import dbus
 import dbus.mainloop.glib
 import dbus.service
 
-try:
-    import gobject
-except ImportError:
-    from gi.repository import GObject as gobject
+import gobject
 
 import kb
 import os

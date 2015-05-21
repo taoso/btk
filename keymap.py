@@ -174,7 +174,7 @@ keytable = {
 # Map modifier keys to array element in the bit array
 modkeys = {
    "KEY_LEFTALT"    : 5,
-   "KEY_LEFTCTRL"   : 7
+   "KEY_LEFTCTRL"   : 7,
    "KEY_LEFTMETA"   : 4,
    "KEY_LEFTSHIFT"  : 6,
    "KEY_RIGHTALT"   : 1,

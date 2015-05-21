@@ -1,7 +1,12 @@
 import dbus
 import dbus.mainloop.glib
 import dbus.service
-import gobject
+
+try:
+    import gobject
+except ImportError:
+    from gi.repository import GObject as gobject
+
 import kb
 import os
 import bluetooth as bt

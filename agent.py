@@ -2,7 +2,11 @@ import sys
 import dbus
 import dbus.service
 import dbus.mainloop.glib
-import gobject
+
+try:
+    import gobject
+except ImportError:
+    from gi.repository import GObject as gobject
 
 BUS_NAME = 'org.bluez'
 AGENT_INTERFACE = 'org.bluez.Agent1'

@@ -1,22 +1,26 @@
+from __future__ import print_function
+from future.builtins import input
 import sys
 import dbus
 import dbus.service
 import dbus.mainloop.glib
 
+from btk import HIDProfile, PSM_CTRL, PSM_INTR
+import uuid
+import bluetooth as bt
+
+
 try:
-    import gobject
-except ImportError:
     from gi.repository import GObject as gobject
+except ImportError:
+    import gobject
 
 BUS_NAME = 'org.bluez'
 AGENT_INTERFACE = 'org.bluez.Agent1'
 AGENT_PATH = "/test/agent"
 
 def ask(prompt):
-    try:
-        return raw_input(prompt)
-    except:
-        return input(prompt)
+    return input(prompt)
 
 def set_trusted(path):
     props = dbus.Interface(bus.get_object("org.bluez", path),
@@ -116,10 +120,7 @@ if __name__ == '__main__':
     manager.RegisterAgent(path, capability)
     manager.RequestDefaultAgent(path)
 
-    from btk import HIDProfile, PSM_CTRL, PSM_INTR
-    import uuid
     print('start hid')
-    import bluetooth as bt
     sock = bt.BluetoothSocket(bt.L2CAP)
     sock.setblocking(False)
     sock.bind(('', PSM_INTR))
@@ -140,3 +141,4 @@ if __name__ == '__main__':
     ).RegisterProfile(obj_path, str(uuid.uuid4()), opts)
 
     gobject.MainLoop().run()
+

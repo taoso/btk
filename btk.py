@@ -1,11 +1,18 @@
+#! /usr/bin/env python
+
+from __future__ import print_function
 import dbus
 import dbus.mainloop.glib
 import dbus.service
 
-import gobject
+try:
+    from gi.repository import GObject as gobject
+except ImportError:
+    import gobject
 
 import kb
 import os
+import sys
 import bluetooth as bt
 import uuid
 import time
@@ -46,8 +53,8 @@ class HIDConnection:
 
     def hello(self):
         print('------hello-------')
-        os.write(self.ctrl_fd, '\xa1\x13\x03')
-        os.write(self.ctrl_fd, '\xa1\x13\x02')
+        os.write(self.ctrl_fd, b'\xa1\x13\x03')
+        os.write(self.ctrl_fd, b'\xa1\x13\x02')
 
         time.sleep(1)
 
@@ -153,3 +160,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

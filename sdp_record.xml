@@ -22,11 +22,6 @@
             </sequence>
         </sequence>
     </attribute>
-    <!-- <attribute id="0x0005"> -->
-    <!--     <sequence> -->
-    <!--         <uuid value="0x1002" /> -->
-    <!--     </sequence> -->
-    <!-- </attribute> -->
     <!-- language base attribute ID list -->
     <attribute id="0x0006">
         <sequence>
@@ -74,16 +69,13 @@
     <attribute id="0x0102">
         <text value="Lv Haitao" />
     </attribute>
-    <!-- <attribute id="0x0200"> -->
-    <!--     <uint16 value="0x0100" /> -->
-    <!-- </attribute> -->
     <!-- HIDParserVersion -->
     <attribute id="0x0201">
         <uint16 value="0x0111" />
     </attribute>
     <!-- HIDDeviceSubclass -->
     <attribute id="0x0202">
-        <uint8 value="0x40" />
+        <uint8 value="0x80" />
     </attribute>
     <!-- HIDCountryCode -->
     <attribute id="0x0203">
@@ -101,8 +93,10 @@
     <attribute id="0x0206">
         <sequence>
             <sequence>
+                <!-- USB Report -->
                 <uint8 value="0x22" />
-                <text encoding="hex" value="05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050c0901a1018503150025017501950b0a23020a21020ab10109b809b609cd09b509e209ea09e9093081029501750d8103c0" />
+                <!-- HID Descriptor that is defined in Section 6.2 of the USB HID Specification -->
+                <text encoding="hex" value="05010902A10185010901A1000509190129031500250175019503810275059501810105010930093109381581257F750895028106C0C005010906A1018502A100050719E029E71500250175019508810295087508150025650507190029658100C0C0" />
             </sequence>
         </sequence>
     </attribute>
@@ -115,9 +109,6 @@
             </sequence>
         </sequence>
     </attribute>
-    <!-- <attribute id="0x020b"> -->
-    <!--     <uint16 value="0x0100" /> -->
-    <!-- </attribute> -->
     <!-- HIDSupervisionTimeout -->
     <attribute id="0x020c">
         <uint16 value="0x0c80" />

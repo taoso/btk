@@ -10,17 +10,21 @@ try:
 except ImportError:
     import gobject
 
-import kb
 import os
 import sys
 import bluetooth as bt
 import uuid
 import time
 import glob
-
+from inputdev import Keyboard, Mouse
 
 mainloop = None
-keyboard = kb.Keyboard(glob.glob('/dev/input/by-id/usb*event-kbd')[0])
+keyboard_dev_paths = glob.glob('/dev/input/by-path/*event-kbd')
+mouse_dev_paths = glob.glob('/dev/input/by-path/*event-mouse')
+
+mouse = Mouse(mouse_dev_paths)
+keyboard = Keyboard(keyboard_dev_paths)
+
 BUF_SIZE = 1024
 PSM_CTRL = 0x11
 PSM_INTR = 0x13
@@ -82,6 +86,7 @@ class HIDConnection:
     def register_intr_sock(self, sock):
         self.hello()
         self.intr_sock = sock
+        mouse.register_intr_sock(self.intr_sock)
         keyboard.register_intr_sock(self.intr_sock)
 
     def close(self):

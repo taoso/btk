@@ -44,6 +44,7 @@ class Mouse(Device):
 
     def update_state(self):
         event = self.event
+        self.state[2] = [0, 0, 0, 0, 0, 0, 0, 0]
         self.state[3] = 0
         self.state[4] = 0
         self.state[5] = 0
@@ -53,10 +54,17 @@ class Mouse(Device):
             self.state[4] = event.value
         elif event.code == ev.ecodes.REL_WHEEL:
             self.state[5] = event.value
+        elif event.code == ev.ecodes.ABS_MISC:
+            if event.value == 1:
+                self.state[2][7] = 1
+            elif event.value == 2:
+                self.state[2][6] = 1
+            elif event.value == 4:
+                self.state[2][5] = 1
 
     def ev_cb(self, dev, io_type):
         event = dev.read_one()
-        if event.type == ev.ecodes.EV_REL:
+        if event.type in [ev.ecodes.EV_REL, ev.ecodes.EV_ABS]:
             self.event = event
             self.update_state()
             self.sock.send(self.to_bstr())

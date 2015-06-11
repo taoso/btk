@@ -22,7 +22,8 @@ mainloop = None
 keyboard_dev_paths = glob.glob('/dev/input/by-path/*event-kbd')
 mouse_dev_paths = glob.glob('/dev/input/by-path/*event-mouse')
 
-mouse = Mouse(mouse_dev_paths)
+# mouse button event will be fired from keyboard_dev_paths
+mouse = Mouse(mouse_dev_paths + keyboard_dev_paths)
 keyboard = Keyboard(keyboard_dev_paths)
 
 BUF_SIZE = 1024

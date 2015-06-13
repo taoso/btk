@@ -134,7 +134,7 @@ def main():
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
     bus = dbus.SystemBus()
-    obj_path = '/ml/jlyu/HIDProfile'
+    obj_path = '/cn/lvht/bluez/HIDProfile'
 
     sock = bt.BluetoothSocket(bt.L2CAP)
     sock.setblocking(False)

@@ -23,7 +23,7 @@ class Device:
 
 class Mouse(Device):
     def __init__(self, dev_path, report_id = 0x01):
-        super().__init__(dev_path, report_id)
+        Device.__init__(self, dev_path, report_id)
 
         self.state.extend([
             # (D7 being the first element, D0 being last)
@@ -93,7 +93,7 @@ class Mouse(Device):
 
 class Keyboard(Device):
     def __init__(self, dev_path, report_id = 0x02):
-        super().__init__(dev_path, report_id)
+        Device.__init__(self, dev_path, report_id)
 
         self.state.extend([
             # Bit array for Modifier keys

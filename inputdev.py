@@ -44,62 +44,35 @@ class Mouse(Device):
 
     def update_state(self):
         event = self.event
-        # this would reset all buttons to unpressed on each event
-        # self.state[2] = [0, 0, 0, 0, 0, 0, 0, 0]
+
         self.state[3] = 0
         self.state[4] = 0
         self.state[5] = 0
+
         if event.code == ev.ecodes.REL_X:
             self.state[3] = event.value
         elif event.code == ev.ecodes.REL_Y:
             self.state[4] = event.value
         elif event.code == ev.ecodes.REL_WHEEL:
+            print('wheel:' + str(event.value))
             self.state[5] = event.value
-        # I didn't see any ABS_MISC codes, and it looks
-        # like these may have been destined for buttons
-        #elif event.code == ev.ecodes.ABS_MISC:
-        #    if event.value == 1:
-        #        self.state[2][7] = 1
-        #    elif event.value == 2:
-        #        self.state[2][6] = 1
-        #    elif event.value == 4:
-        #        self.state[2][5] = 1
         elif event.code == ev.ecodes.BTN_LEFT:
             self.state[2][7] = event.value
         elif event.code == ev.ecodes.BTN_MIDDLE:
             self.state[2][5] = event.value
         elif event.code == ev.ecodes.BTN_RIGHT:
             self.state[2][6] = event.value
-        else:
-            print("unhandled code:")
-            print(event.code)
-            print("value:")
-            print(event.value)
-            print("event:")
-            print(event.__repr__)
 
     def ev_cb(self, dev, io_type):
         event = dev.read_one()
-        if event.type in [ev.ecodes.EV_REL,
-                          ev.ecodes.EV_ABS,
-                          ev.ecodes.EV_KEY
-                      ]:
+        if event.type in [
+                ev.ecodes.EV_REL,
+                ev.ecodes.EV_ABS,
+                ev.ecodes.EV_KEY
+        ]:
             self.event = event
             self.update_state()
             self.sock.send(self.to_bstr())
-        elif event.type == ev.ecodes.EV_SYN:
-            pass
-        elif event.type == ev.ecodes.EV_MSC:
-            # not sure what MSC info from the mouse does
-            pass
-        else:
-            print('unhandled mouse')
-            print("code:")
-            print(event.code)
-            print("value:")
-            print(event.value)
-            print("event:")
-            print(event.__repr__)
 
         return True
 
@@ -119,6 +92,9 @@ class Mouse(Device):
                 hex_str += struct.pack("B", element)
 
         for element in self.state[3:]:
+            if element > 127:
+                element = 127
+
             hex_str += struct.pack("b", element)
 
         return hex_str

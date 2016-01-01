@@ -4,7 +4,6 @@ import sys
 import dbus
 import dbus.service
 import dbus.mainloop.glib
-# import gobject
 import evdev as ev
 import glob
 
@@ -66,7 +65,7 @@ class Agent(dbus.service.Object):
     def RequestPasskey(self, device):
         print("RequestPasskey (%s)" % (device))
         passkey = ""
-        kb = ev.InputDevice(glob.glob('/dev/input/by-id/usb*event-kbd')[0])
+        kb = ev.InputDevice(glob.glob('/dev/input/by-path/*event-kbd')[0])
         print(kb)
         for event in kb.read_loop():
             data = ev.categorize(event)

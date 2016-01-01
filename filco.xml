@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<record>
+    <attribute id="0x0000">
+        <uint32 value="0x00010000" />
+    </attribute>
+    <attribute id="0x0001">
+        <sequence>
+            <uuid value="0x1124" />
+        </sequence>
+    </attribute>
+    <attribute id="0x0004">
+        <sequence>
+            <sequence>
+                <uuid value="0x0100" />
+                <uint16 value="0x0011" />
+            </sequence>
+            <sequence>
+                <uuid value="0x0011" />
+            </sequence>
+        </sequence>
+    </attribute>
+    <attribute id="0x0005">
+        <sequence>
+            <uuid value="0x1002" />
+        </sequence>
+    </attribute>
+    <attribute id="0x0006">
+        <sequence>
+            <uint16 value="0x656e" />
+            <uint16 value="0x006a" />
+            <uint16 value="0x0100" />
+        </sequence>
+    </attribute>
+    <attribute id="0x0009">
+        <sequence>
+            <sequence>
+                <uuid value="0x1124" />
+                <uint16 value="0x0100" />
+            </sequence>
+        </sequence>
+    </attribute>
+    <attribute id="0x000d">
+        <sequence>
+            <sequence>
+                <sequence>
+                    <uuid value="0x0100" />
+                    <uint16 value="0x0013" />
+                </sequence>
+                <sequence>
+                    <uuid value="0x0011" />
+                </sequence>
+            </sequence>
+        </sequence>
+    </attribute>
+    <attribute id="0x0100">
+        <text value="Broadcom Bluetooth Wireless Keyboard" />
+    </attribute>
+    <attribute id="0x0101">
+        <text value="Keyboard" />
+    </attribute>
+    <attribute id="0x0102">
+        <text value="Broadcom Corp." />
+    </attribute>
+    <attribute id="0x0200">
+        <uint16 value="0x0101" />
+    </attribute>
+    <attribute id="0x0201">
+        <uint16 value="0x0111" />
+    </attribute>
+    <attribute id="0x0202">
+        <uint8 value="0x40" />
+    </attribute>
+    <attribute id="0x0203">
+        <uint8 value="0x21" />
+    </attribute>
+    <attribute id="0x0204">
+        <boolean value="true" />
+    </attribute>
+    <attribute id="0x0205">
+        <boolean value="true" />
+    </attribute>
+    <attribute id="0x0206">
+        <sequence>
+            <sequence>
+                <uint8 value="0x22" />
+                <text encoding="hex" value="05010906a101850175019508050719e029e715002501810295017508810395057501050819012905910295017503910395067508150026ff000507190029ff8100c0050c0901a1018502150025017501951a0a94010a92010a83010a23020a8a010a82010a21020a24020a25020a26020a27020a2a020aa3020aa4020aa50209b609b509b709b009e909ea09e209cd09b80ab10109308102950175068103c0050c0901a101850305010906a10205060920150026ff00750895018102c0c005010980a101850415002501750195030981098209838102950175058103c0050c0901a10185ff05069501750219242926810275068101c0" />
+            </sequence>
+        </sequence>
+    </attribute>
+    <attribute id="0x0207">
+        <sequence>
+            <sequence>
+                <uint16 value="0x0409" />
+                <uint16 value="0x0100" />
+            </sequence>
+        </sequence>
+    </attribute>
+    <attribute id="0x0209">
+        <boolean value="true" />
+    </attribute>
+    <attribute id="0x020a">
+        <boolean value="true" />
+    </attribute>
+    <attribute id="0x020b">
+        <uint16 value="0x0100" />
+    </attribute>
+    <attribute id="0x020c">
+        <uint16 value="0x1f40" />
+    </attribute>
+    <attribute id="0x020d">
+        <boolean value="false" />
+    </attribute>
+    <attribute id="0x020e">
+        <boolean value="true" />
+    </attribute>
+</record>
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<record>
+    <attribute id="0x0000">
+        <uint32 value="0x00010001" />
+    </attribute>
+    <attribute id="0x0001">
+        <sequence>
+            <uuid value="0x1200" />
+        </sequence>
+    </attribute>
+    <attribute id="0x0004">
+        <sequence>
+            <sequence>
+                <uuid value="0x0100" />
+                <uint16 value="0x0001" />
+            </sequence>
+            <sequence>
+                <uuid value="0x0001" />
+            </sequence>
+        </sequence>
+    </attribute>
+    <attribute id="0x0009">
+        <sequence>
+            <sequence>
+                <uuid value="0x1200" />
+                <uint16 value="0x0100" />
+            </sequence>
+        </sequence>
+    </attribute>
+    <attribute id="0x0200">
+        <uint16 value="0x0100" />
+    </attribute>
+    <attribute id="0x0201">
+        <uint16 value="0x0a5c" />
+    </attribute>
+    <attribute id="0x0202">
+        <uint16 value="0x8502" />
+    </attribute>
+    <attribute id="0x0203">
+        <uint16 value="0x011b" />
+    </attribute>
+    <attribute id="0x0204">
+        <boolean value="true" />
+    </attribute>
+    <attribute id="0x0205">
+        <uint16 value="0x0002" />
+    </attribute>
+</record>

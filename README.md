@@ -14,7 +14,7 @@ btk
 
 我是Arch Linux的粉丝。Arch滚动发布，升级比较快，系统的各个软件版本都很新。所以合理的方案应该兼容最新的系统。
 
-向来想去，也就只有蓝牙键盘能够满足以上要求了。也就是说，我们使用蓝牙协议将电脑虚拟成一个蓝牙HID输入设备。这样iPad就会自动识别我们的电脑了。
+想来想去，也就只有蓝牙键盘能够满足以上要求了。也就是说，我们使用蓝牙协议将电脑虚拟成一个蓝牙HID输入设备。这样iPad就会自动识别我们的电脑了。
 
 要想实现一个蓝牙键盘，需要做以下工作：
 
@@ -55,3 +55,61 @@ keyboard = kb.Keyboard('/dev/input/event3')
 ```
 
 启动蓝牙之后以root用户运行btk.py脚本就可以了。
+
+键鼠HID报告描述符
+=================
+以下是一个具有键盘和鼠标功能的HID描述符，具体参见USB HID协议。
+```
+0x05, 0x01, // UsagePage GenericDesktop
+0x09, 0x02, // Usage Mouse
+0xA1, 0x01, // Collection Application
+0x85, 0x01, // REPORT ID: 1
+0x09, 0x01, // Usage Pointer
+0xA1, 0x00, // Collection Physical
+0x05, 0x09, // UsagePage Buttons
+0x19, 0x01, // UsageMinimum 1
+0x29, 0x03, // UsageMaximum 3
+0x15, 0x00, // LogicalMinimum 0
+0x25, 0x01, // LogicalMaximum 1
+0x75, 0x01, // ReportSize 1
+0x95, 0x03, // ReportCount 3
+0x81, 0x02, // Input data variable absolute
+0x75, 0x05, // ReportSize 5
+0x95, 0x01, // ReportCount 1
+0x81, 0x01, // InputConstant (padding)
+0x05, 0x01, // UsagePage GenericDesktop
+0x09, 0x30, // Usage X
+0x09, 0x31, // Usage Y
+0x09, 0x38, // Usage ScrollWheel
+0x15, 0x81, // LogicalMinimum -127
+0x25, 0x7F, // LogicalMaximum +127
+0x75, 0x08, // ReportSize 8
+0x95, 0x02, // ReportCount 3
+0x81, 0x06, // Input data variable relative
+0xC0, 0xC0, // EndCollection EndCollection
+0x05, 0x01, // UsagePage GenericDesktop
+0x09, 0x06, // Usage Keyboard
+0xA1, 0x01, // Collection Application
+0x85, 0x02, // REPORT ID: 2
+0xA1, 0x00, // Collection Physical
+0x05, 0x07, // UsagePage Keyboard
+0x19, 0xE0, // UsageMinimum 224
+0x29, 0xE7, // UsageMaximum 231
+0x15, 0x00, // LogicalMinimum 0
+0x25, 0x01, // LogicalMaximum 1
+0x75, 0x01, // ReportSize 1
+0x95, 0x08, // ReportCount 8
+0x81, 0x02, // **Input data variable absolute
+0x95, 0x08, // ReportCount 8
+0x75, 0x08, // ReportSize 8
+0x15, 0x00, // LogicalMinimum 0
+0x25, 0x65, // LogicalMaximum 101
+0x05, 0x07, // UsagePage Keycodes
+0x19, 0x00, // UsageMinimum 0
+0x29, 0x65, // UsageMaximum 101
+0x81, 0x00, // **Input DataArray
+0xC0, 0xC0, // EndCollection
+```
+摘自[Python编程.Bluetooth HID Mouse and Keyboard（一）](http://blog.csdn.net/huipengzhao/article/details/18268201)。
+
+将以上描述符去掉`0x`、`,`和注释，拼成一行放入HID描述xml文件的`HID Descriptor`属性即可。

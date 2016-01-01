@@ -1,17 +1,31 @@
+#! /usr/bin/env python
+
+from __future__ import print_function
 import dbus
 import dbus.mainloop.glib
 import dbus.service
-import gobject
-import kb
+
+try:
+    from gi.repository import GObject as gobject
+except ImportError:
+    import gobject
+
 import os
+import sys
 import bluetooth as bt
 import uuid
 import time
 import glob
-
+from inputdev import Keyboard, Mouse
 
 mainloop = None
-keyboard = kb.Keyboard(glob.glob('/dev/input/by-id/usb*event-kbd')[0])
+keyboard_dev_paths = glob.glob('/dev/input/by-path/*event-kbd')
+mouse_dev_paths = glob.glob('/dev/input/by-path/*event-mouse')
+
+# mouse button event will be fired from keyboard_dev_paths
+mouse = Mouse(mouse_dev_paths + keyboard_dev_paths)
+keyboard = Keyboard(keyboard_dev_paths)
+
 BUF_SIZE = 1024
 PSM_CTRL = 0x11
 PSM_INTR = 0x13
@@ -44,8 +58,8 @@ class HIDConnection:
 
     def hello(self):
         print('------hello-------')
-        os.write(self.ctrl_fd, '\xa1\x13\x03')
-        os.write(self.ctrl_fd, '\xa1\x13\x02')
+        os.write(self.ctrl_fd, b'\xa1\x13\x03')
+        os.write(self.ctrl_fd, b'\xa1\x13\x02')
 
         time.sleep(1)
 
@@ -73,6 +87,7 @@ class HIDConnection:
     def register_intr_sock(self, sock):
         self.hello()
         self.intr_sock = sock
+        mouse.register_intr_sock(self.intr_sock)
         keyboard.register_intr_sock(self.intr_sock)
 
     def close(self):
@@ -119,7 +134,7 @@ def main():
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
     bus = dbus.SystemBus()
-    obj_path = '/ml/jlyu/HIDProfile'
+    obj_path = '/cn/lvht/bluez/HIDProfile'
 
     sock = bt.BluetoothSocket(bt.L2CAP)
     sock.setblocking(False)
@@ -151,3 +166,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

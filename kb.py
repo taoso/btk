@@ -1,7 +1,12 @@
-import gobject
+try:
+    from gi.repository import GObject as gobject
+except ImportError:
+    import gobject
+
 import evdev as ev
 import keymap
 import os
+import struct
 
 class Keyboard:
     fd = -1
@@ -64,17 +69,13 @@ class Keyboard:
         if event.type == ev.ecodes.EV_KEY and event.value < 2:
             self.event = event
             self.update_state()
-
-            try:
-                self.sock.send(self.to_bstr())
-            except Exception as e:
-                print(e, e.message)
+            self.sock.send(self.to_bstr())
 
         return True
 
     def to_bstr(self):
         # Convert the hex array to a string
-        hex_str = ""
+        hex_str = b""
         for element in self.state:
             if type(element) is list:
                 # This is our bit array - convert it to a single byte represented
@@ -82,10 +83,10 @@ class Keyboard:
                 bin_str = ""
                 for bit in element:
                     bin_str += str(bit)
-                hex_str += chr(int(bin_str, 2))
+                hex_str += struct.pack("B", int(bin_str, 2))
             else:
                 # This is a hex value - we can convert it straight to a char
-                hex_str += chr(element)
+                hex_str += struct.pack("B", element)
 
         return hex_str
 
@@ -95,3 +96,4 @@ if __name__ == '__main__':
     kb.register_cb(open('/tmp/kb', 'w').fileno())
 
     gobject.MainLoop().run()
+

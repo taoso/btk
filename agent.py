@@ -126,6 +126,7 @@ if __name__ == '__main__':
         bus.get_object("org.bluez", '/org/bluez/hci0'),
         "org.freedesktop.DBus.Properties"
     )
+    props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(True))
     props.Set("org.bluez.Adapter1", "Discoverable", dbus.Boolean(True))
 
 
@@ -158,4 +159,3 @@ if __name__ == '__main__':
     ).RegisterProfile(obj_path, str(uuid.uuid4()), opts)
 
     gobject.MainLoop().run()
-

@@ -19,7 +19,7 @@ import glob
 from inputdev import Keyboard, Mouse
 
 from IPython import embed
-
+import struct
 
 mainloop = None
 keyboard_dev_paths = glob.glob('/dev/input/by-path/*event-kbd')
@@ -73,7 +73,7 @@ class HIDConnection:
             print('someone disconnected')
             # I get this when we disconnect
             return False
-        
+
         handshake = HIDP_TRANS_HANDSHAKE
         if data.__class__ == str:
             print('Received' + data.__repr__())
@@ -82,13 +82,13 @@ class HIDConnection:
                 handshake |= HIDP_HSHK_SUCCESSFUL
                 os.write(fd, str(handshake))
                 return True
-                
+
         msg_type = data[0] & HIDP_HEADER_TRANS_MASK
 
         if msg_type & HIDP_TRANS_SET_PROTOCOL:
             print('set protocol')
             handshake |= HIDP_HSHK_SUCCESSFUL
-            os.write(fd, handshake)
+            os.write(fd, struct.pack("b", handshake))
             return True
 
         if msg_type & HIDP_TRANS_DATA:
@@ -97,7 +97,7 @@ class HIDConnection:
 
         print('unknown error')
         handshake |= HIDP_HSHK_ERR_UNKNOWN
-        os.write(fd, handshake)
+        os.write(fd, struct.pack("b", handshake))
         return True
 
     def register_intr_sock(self, sock):

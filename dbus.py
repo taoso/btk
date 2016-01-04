@@ -10,7 +10,7 @@ class Server(object):
         method_inargs = {}
         for method in interface_info.methods:
             method_outargs[method.name] = '(' + ''.join([arg.signature for arg in method.out_args]) + ')'
-            method_inargs[method.name] = tuple(arg.name for arg in method.in_args)
+            method_inargs[method.name] = tuple(arg.signature for arg in method.in_args)
 
         self.method_inargs = method_inargs
         self.method_outargs = method_outargs
@@ -32,17 +32,23 @@ class Server(object):
                        parameters,
                        invocation):
 
-        import IPython
-        IPython.embed()
-        kwargs = dict(zip(self.method_inargs[method_name], parameters.unpack()))
-        result = getattr(self, method_name)(**kwargs)
+        args = list(parameters.unpack())
+        for i, sig in enumerate(self.method_inargs[method_name]):
+            if sig is 'h':
+                msg = invocation.get_message()
+                fd_list = msg.get_unix_fd_list()
+                args[i] = fd_list.get(args[i])
+
+        result = getattr(self, method_name)(*args)
 
         if type(result) is list:
             result = tuple(result)
         elif not type(result) is tuple:
             result = (result,)
 
-        invocation.return_value(GLib.Variant(self.method_outargs[method_name], result))
+        out_args = self.method_outargs[method_name]
+        if out_args != '()':
+            invocation.return_value(GLib.Variant(out_args, result))
 
 class Foo(Server):
     '''

@@ -14,7 +14,6 @@ import time
 import glob
 from inputdev import Keyboard, Mouse
 
-from IPython import embed
 import struct
 
 keyboard_dev_paths = glob.glob('/dev/input/by-path/*event-kbd')
@@ -137,8 +136,7 @@ class HIDProfile(Server):
 
     def NewConnection(self, device, fd, fd_properties):
         print("new control connectin")
-        embed()
-        self.conns[device] = HIDConnection(fd.take())
+        self.conns[device] = HIDConnection(fd)
 
         def new_intr_conn(ssock, ip_type):
             sock, info = ssock.accept()

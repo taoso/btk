@@ -54,7 +54,6 @@ class Mouse(Device):
         elif event.code == ev.ecodes.REL_Y:
             self.state[4] = event.value
         elif event.code == ev.ecodes.REL_WHEEL:
-            print('wheel:' + str(event.value))
             self.state[5] = event.value
         elif event.code == ev.ecodes.BTN_LEFT:
             self.state[2][7] = event.value

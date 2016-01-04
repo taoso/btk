@@ -1,14 +1,10 @@
 #! /usr/bin/env python
 
 from __future__ import print_function
-import dbus
-import dbus.mainloop.glib
-import dbus.service
 
-try:
-    from gi.repository import GObject as gobject
-except ImportError:
-    import gobject
+from gi.repository import GLib, Gio
+from pydbus import SessionBus, SystemBus
+from dbus import Server
 
 import os
 import sys
@@ -21,7 +17,6 @@ from inputdev import Keyboard, Mouse
 from IPython import embed
 import struct
 
-mainloop = None
 keyboard_dev_paths = glob.glob('/dev/input/by-path/*event-kbd')
 mouse_dev_paths = glob.glob('/dev/input/by-path/*event-mouse')
 
@@ -53,9 +48,9 @@ class HIDConnection:
     def __init__(self, ctrl_fd):
         self.ctrl_fd = ctrl_fd
 
-        self.ctrl_io_id = gobject.io_add_watch(
+        self.ctrl_io_id = GLib.io_add_watch(
             self.ctrl_fd,
-            gobject.IO_IN,
+            GLib.IO_IN,
             self.ctrl_data_cb
         )
 
@@ -109,77 +104,77 @@ class HIDConnection:
     def close(self):
         pass
 
-class HIDProfile(dbus.service.Object):
+class HIDProfile(Server):
+    '''
+<node>
+	<interface name='org.bluez.Profile1'>
+		<method name='Release'></method>
+		<method name='RequestDisconnection'>
+			<arg type='o' name='device' direction='in'/>
+		</method>
+		<method name='NewConnection'>
+			<arg type='o' name='device' direction='in'/>
+			<arg type='h' name='fd' direction='in'/>
+			<arg type='a{sv}' name='fd_properties' direction='in'/>
+		</method>
+	</interface>
+</node>
+    '''
     conns = {}
     sock = None
 
     def __init__(self, bus, path, sock):
-        dbus.service.Object.__init__(self, bus, path)
-        if (sock):
-            self.sock = sock
+        Server.__init__(self, bus, path)
+        self.sock = sock
 
-    @dbus.service.method("org.bluez.Profile1",
-                         in_signature="", out_signature="")
     def Release(self):
         print("Release")
-        mainloop.quit()
+        self.quit()
 
-    @dbus.service.method("org.bluez.Profile1",
-                         in_signature="o", out_signature="")
-    def RequestDisconnection(self, path):
+    def RequestDisconnection(self, device):
         print('RequestDisconnection')
-        conns.pop(path).close()
+        conns.pop(device).close()
 
-    @dbus.service.method("org.bluez.Profile1",
-                         in_signature="oha{sv}", out_signature="")
-    def NewConnection(self, path, fd, properties):
+    def NewConnection(self, device, fd, fd_properties):
         print("new control connectin")
-        self.conns[path] = HIDConnection(fd.take())
+        embed()
+        self.conns[device] = HIDConnection(fd.take())
 
         def new_intr_conn(ssock, ip_type):
             sock, info = ssock.accept()
             print("interrput connection:", info)
-            self.conns[path].register_intr_sock(sock)
-
+            self.conns[device].register_intr_sock(sock)
             return False
 
-        gobject.io_add_watch(self.sock, gobject.IO_IN, new_intr_conn)
-
+        GLib.io_add_watch(self.sock, GLib.IO_IN, new_intr_conn)
 
 def main():
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-
-    bus = dbus.SystemBus()
-    obj_path = '/cn/lvht/bluez/HIDProfile'
+    bus = SystemBus()
+    bus.own_name('net.lvht.btk')
+    obj_path = '/net/lvht/btk/HIDProfile'
 
     sock = bt.BluetoothSocket(bt.L2CAP)
     sock.setblocking(False)
     try:
         sock.bind(('', PSM_INTR))
     except:
-        print("Someone has the bluetooth HID socket open, it might be bluetoothd")
         print("For bluez5 add --noplugin=input to the bluetoothd commandline")
-        print("For bluez4 add PluginsDisable=input to /etc/bluetooth/main.conf")
         print("Else there is another application running that has it open.")
         sys.exit(errno.EACCES)
     sock.listen(1)
 
-    profile = HIDProfile(bus, obj_path, sock)
+    profile = HIDProfile(bus.con, obj_path, sock)
 
     opts = {
-        "PSM": dbus.UInt16(PSM_CTRL),
-        "ServiceRecord": open('./sdp_record.xml', 'r').read(),
-        "RequireAuthentication": dbus.Boolean(True),
-        "RequireAuthorization": dbus.Boolean(False),
+        "PSM": GLib.Variant.new_uint16(PSM_CTRL),
+        "ServiceRecord": GLib.Variant.new_string(open('./sdp_record.xml', 'r').read()),
+        "RequireAuthentication": GLib.Variant.new_boolean(True),
+        "RequireAuthorization": GLib.Variant.new_boolean(False),
     }
-    dbus.Interface(
-        bus.get_object("org.bluez", "/org/bluez"),
-        "org.bluez.ProfileManager1"
-    ).RegisterProfile(obj_path, str(uuid.uuid4()), opts)
+    manager = bus.get('org.bluez')['.ProfileManager1']
+    manager.RegisterProfile(obj_path, str(uuid.uuid4()), opts)
 
-    gobject.MainLoop().run()
-
+    profile.run()
 
 if __name__ == '__main__':
     main()
-

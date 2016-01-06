@@ -29,7 +29,6 @@ HIDP协议栈全文可以从蓝牙官网下载到，但是是英文的，啃吧�
 
 - 无法支持多设备连接
 - 无法很优雅地处理设备断掉连接的情况
-- 无法独自完成设备之间的认证和授权（依赖GNOME）工作
 - 主程序不支持配置选项
 - 不支持systemd集成
 
@@ -43,18 +42,18 @@ HIDP协议栈全文可以从蓝牙官网下载到，但是是英文的，啃吧�
 - 蓝牙硬件
 - BlueZ(>=5)
 - python(>=2.7)
+- [PyGObject](https://live.gnome.org/PyGObject)
 - [evdev](https://pypi.python.org/pypi/evdev)
-- [dbus-python](https://pypi.python.org/pypi/dbus-python)
+- [pydbus]()
 - [PyBlueZ](https://pypi.python.org/pypi/PyBluez)
 - iOS或者Android设备
 
-系统准备好之后需要对源代码做少许修改。我的电脑的键盘设备节点是`/dev/input/event3`，所以我就将路径硬编码到程序中了。大家需要找到自己的键盘设备节点，然后对btk.py中的第13行做相应更改。
-
-```py
-keyboard = kb.Keyboard('/dev/input/event3')
+首先，运行脚本：
+```bash
+sudo python agent.py
 ```
 
-启动蓝牙之后以root用户运行btk.py脚本就可以了。
+然后使用手机搜索蓝牙，找到你的主机点击配对。这时agent.py脚本会提示你输入配对码。直接输入并回车即可开启体验之旅。
 
 键鼠HID报告描述符
 =================

@@ -1,22 +1,16 @@
 from __future__ import print_function
 
-import sys
 import evdev as ev
 import glob
 
-from btk import HIDProfile, PSM_CTRL, PSM_INTR
-import uuid
 import bluetooth as bt
 
 from gi.repository import GLib
-
 from pydbus import SystemBus
 from dbus import Server
 
-bus = SystemBus()
-
 def ask(prompt):
-    return 1111 # input(prompt)
+    return 1111
 
 def set_trusted(path):
     props = bus.get('org.bluez', path)['org.freedesktop.DBus.Properties']
@@ -26,7 +20,6 @@ def set_trusted(path):
 def dev_connect(path):
     dev = bus.get('org.bluez', path)['org.bluez.Device1']
     dev.Connect()
-
 
 class Agent(Server):
     '''
@@ -118,11 +111,12 @@ class Agent(Server):
     def Cancel(self):
         print("Cancel")
 
-if __name__ == '__main__':
+def open_hci():
     props = bus.get('org.bluez', '/org/bluez/hci0')['org.freedesktop.DBus.Properties']
     props.Set("org.bluez.Adapter1", "Powered", GLib.Variant.new_boolean(True))
     props.Set("org.bluez.Adapter1", "Discoverable", GLib.Variant.new_boolean(True))
 
+def register_agent():
     capability = "KeyboardOnly"
     path = "/net/lvht/btk/agent"
     agent = Agent(bus.con, path)
@@ -130,22 +124,11 @@ if __name__ == '__main__':
     manager.RegisterAgent(path, capability)
     manager.RequestDefaultAgent(path)
 
+if __name__ == '__main__':
+    bus = SystemBus()
+    open_hci()
+    register_agent()
+
     print('start hid')
-    sock = bt.BluetoothSocket(bt.L2CAP)
-    sock.setblocking(False)
-    sock.bind(('', PSM_INTR))
-    sock.listen(1)
-
-    obj_path = '/net/lvht/btk/HIDProfile'
-    profile = HIDProfile(bus.con, obj_path, sock)
-
-    opts = {
-        "PSM": GLib.Variant.new_uint16(PSM_CTRL),
-        "ServiceRecord": GLib.Variant.new_string(open('./sdp_record.xml', 'r').read()),
-        "RequireAuthentication": GLib.Variant.new_boolean(True),
-        "RequireAuthorization": GLib.Variant.new_boolean(True),
-    }
-    manager = bus.get('org.bluez')['.ProfileManager1']
-    manager.RegisterProfile(obj_path, str(uuid.uuid4()), opts)
-
-    GLib.MainLoop().run()
+    import btk
+    btk.loop()

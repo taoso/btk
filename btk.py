@@ -146,7 +146,7 @@ class HIDProfile(Server):
 
         GLib.io_add_watch(self.sock, GLib.IO_IN, new_intr_conn)
 
-def main():
+def loop():
     bus = SystemBus()
     bus.own_name('net.lvht.btk')
     obj_path = '/net/lvht/btk/HIDProfile'
@@ -175,4 +175,4 @@ def main():
     profile.run()
 
 if __name__ == '__main__':
-    main()
+    loop()

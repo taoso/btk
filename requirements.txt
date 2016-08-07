@@ -1,4 +1,4 @@
 future
 evdev
 PyBluez
-pydbus
+pydbus==0.3

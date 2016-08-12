@@ -1,4 +1,5 @@
 future
 evdev
 PyBluez
-pydbus==0.3
+#pydbus==0.5.1
+-e git://github.com/LEW21/pydbus.git@d6c1a27a2bd17280f63b0093872ffa89d8658f08#egg=pydbus

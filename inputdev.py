@@ -1,3 +1,5 @@
+import struct
+
 try:
     from gi.repository import GObject as gobject
 except ImportError:
@@ -5,8 +7,6 @@ except ImportError:
 
 import evdev as ev
 import keymap
-import os
-import struct
 
 class Device:
     def __init__(self, dev_paths, report_id):

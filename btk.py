@@ -2,19 +2,20 @@
 
 from __future__ import print_function
 
-from gi.repository import GLib, Gio
-from pydbus import SessionBus, SystemBus
-from dbus import Server
-
-import os
-import sys
-import bluetooth as bt
-import uuid
-import time
+import errno
 import glob
-from inputdev import Keyboard, Mouse
-
+import os
 import struct
+import sys
+import time
+import uuid
+
+from gi.repository import GLib
+from pydbus import SystemBus
+import bluetooth as bt
+
+from dbus import Server
+from inputdev import Keyboard, Mouse
 
 keyboard_dev_paths = glob.glob('/dev/input/by-path/*event-kbd')
 mouse_dev_paths = glob.glob('/dev/input/by-path/*event-mouse')

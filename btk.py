@@ -78,7 +78,7 @@ class HIDConnection:
                 os.write(fd, str(handshake))
                 return True
 
-        msg_type = data[0] & HIDP_HEADER_TRANS_MASK
+        msg_type = ord(data[0]) & HIDP_HEADER_TRANS_MASK
 
         if msg_type & HIDP_TRANS_SET_PROTOCOL:
             print('set protocol')
@@ -95,7 +95,7 @@ class HIDConnection:
         os.write(fd, struct.pack("b", handshake))
         return True
 
-    def register_intr_sock(self, sock):
+    def register_intr_socks(self, sock):
         self.hello()
         self.intr_sock = sock
         mouse.register_intr_sock(self.intr_sock)
@@ -133,16 +133,16 @@ class HIDProfile(Server):
 
     def RequestDisconnection(self, device):
         print('RequestDisconnection')
-        conns.pop(device).close()
+        self.conns.pop(device).close()
 
     def NewConnection(self, device, fd, fd_properties):
-        print("new control connectin")
+        print("new control connection")
         self.conns[device] = HIDConnection(fd)
 
         def new_intr_conn(ssock, ip_type):
             sock, info = ssock.accept()
-            print("interrput connection:", info)
-            self.conns[device].register_intr_sock(sock)
+            print("interrupt connection:", info)
+            self.conns[device].register_intr_socks(sock)
             return False
 
         GLib.io_add_watch(self.sock, GLib.IO_IN, new_intr_conn)

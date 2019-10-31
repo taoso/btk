@@ -2,3 +2,4 @@ future
 evdev
 PyBluez
 pydbus
+pyudev

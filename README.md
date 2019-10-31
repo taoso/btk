@@ -28,7 +28,6 @@ HIDP协议栈全文可以从蓝牙官网下载到，但是是英文的，啃吧�
 到目前为止，btk可以与iPad和安卓手机正常配合工作，但仍然有一些问题：
 
 - 无法支持多设备连接
-- 无法很优雅地处理设备断掉连接的情况
 - 主程序不支持配置选项
 - 不支持systemd集成
 
@@ -46,6 +45,7 @@ HIDP协议栈全文可以从蓝牙官网下载到，但是是英文的，啃吧�
 - [evdev](https://pypi.python.org/pypi/evdev)
 - [pydbus]()
 - [PyBlueZ](https://pypi.python.org/pypi/PyBluez)
+- [pyudev](https://pypi.org/project/pyudev/)
 - iOS或者Android设备
 
 首先，运行脚本：

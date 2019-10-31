@@ -9,6 +9,7 @@ from dbus import Server
 import os
 import sys
 import bluetooth as bt
+import pyudev as udev
 import uuid
 import time
 import glob
@@ -41,8 +42,9 @@ class HIDConnection:
     ctrl_fd = -1
     intr_sock = None
     ctrl_io_id = None
-    intr_id_id = None
-    kb = None
+    mouse = Mouse()
+    keyboard = Keyboard()
+    udev_observer = None
 
     def __init__(self, ctrl_fd):
         self.ctrl_fd = ctrl_fd
@@ -97,11 +99,35 @@ class HIDConnection:
     def register_intr_sock(self, sock):
         self.hello()
         self.intr_sock = sock
-        mouse.register_intr_sock(self.intr_sock)
-        keyboard.register_intr_sock(self.intr_sock)
+        self.mouse.register_intr_sock(self.intr_sock)
+        self.keyboard.register_intr_sock(self.intr_sock)
+        self.udev_monitor_daemon()
+
+    def udev_monitor_daemon(self):
+        '''
+        Run a background monitor thread that will add new device watchers
+        as they are plugged in
+        '''
+        context = udev.Context()
+        monitor = udev.Monitor.from_netlink(context)
+        monitor.filter_by(subsystem='input')
+        def input_device_add(action, udev_device):
+            if action == 'add' and 'DEVNAME' in udev_device:
+                dev_path = udev_device.get('DEVNAME')
+                if 'event' not in dev_path or udev_device.get('ID_TYPE') != 'hid':
+                    return
+                if 'ID_INPUT_MOUSE' in udev_device:
+                    self.mouse.hotplug_plug_dev(udev_device)
+                if 'ID_INPUT_KEY' in udev_device:
+                    self.mouse.hotplug_plug_dev(udev_device) # maybe mouse clicks
+                    self.keyboard.hotplug_plug_dev(udev_device)
+        for device in context.list_devices(subsystem='input'):
+            input_device_add('add', device)
+        self.udev_observer = udev.MonitorObserver(monitor, input_device_add)
+        self.udev_observer.start()
 
     def close(self):
-        pass
+        self.udev_observer.stop()
 
 class HIDProfile(Server):
     '''

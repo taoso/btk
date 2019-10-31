@@ -9,21 +9,39 @@ import os
 import struct
 
 class Device:
-    def __init__(self, dev_paths, report_id):
-        self.devs = [ev.InputDevice(dev_path) for dev_path in dev_paths]
+    def __init__(self, report_id):
         self.state = [
             0xA1, # This is an input report by USB
             report_id, # Report Id assigned for Mouse, in HID Descriptor
         ]
+        self.watches = [] # list of watch descriptors to be deleted on disconnect
+
+    def __del__(self):
+        for watch in self.watches:
+            gobject.source_remove(watch)
 
     def register_intr_sock(self, sock):
         self.sock = sock
-        for dev in self.devs:
-            gobject.io_add_watch(dev, gobject.IO_IN, self.ev_cb)
+
+    def hotplug_plug_dev(self, udev_device):
+        ev_device = ev.InputDevice(udev_device.get('DEVNAME'))
+        ev_device.repeat = ev.device.KbdInfo(repeat=0, delay=0)
+        print("Adding new %s" % ev_device)
+        watch = gobject.io_add_watch(ev_device, gobject.IO_IN, self.ev_cb)
+        # device unplug event:
+        gobject.io_add_watch(ev_device, gobject.IO_HUP, self.del_watch, watch)
+        if watch not in self.watches:
+            self.watches.append(watch)
+
+    def del_watch(self, ev_device, io_type, watch):
+        print("Removing %s" % ev_device)
+        gobject.source_remove(watch)
+        self.watches.remove(watch)
+        return False
 
 class Mouse(Device):
-    def __init__(self, dev_path, report_id = 0x01):
-        Device.__init__(self, dev_path, report_id)
+    def __init__(self, report_id=0x01):
+        Device.__init__(self, report_id)
 
         self.state.extend([
             # (D7 being the first element, D0 being last)
@@ -99,8 +117,8 @@ class Mouse(Device):
         return hex_str
 
 class Keyboard(Device):
-    def __init__(self, dev_path, report_id = 0x02):
-        Device.__init__(self, dev_path, report_id)
+    def __init__(self, report_id=0x02):
+        Device.__init__(self, report_id)
 
         self.state.extend([
             # Bit array for Modifier keys

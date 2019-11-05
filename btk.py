@@ -71,7 +71,7 @@ class HIDConnection:
 
         handshake = HIDP_TRANS_HANDSHAKE
         if data.__class__ == str:
-            print('Received' + data.__repr__())
+            print('Received ' + data.__repr__())
             if data[0] == '\x03':
                 print('set protocol')
                 handshake |= HIDP_HSHK_SUCCESSFUL
@@ -132,11 +132,11 @@ class HIDProfile(Server):
         self.quit()
 
     def RequestDisconnection(self, device):
-        print('RequestDisconnection')
+        print('RequestDisconnection (%s)' % device)
         self.conns.pop(device).close()
 
     def NewConnection(self, device, fd, fd_properties):
-        print("new control connection")
+        print("New control connection (%s, %d, %s)" % (device, fd, fd_properties))
         self.conns[device] = HIDConnection(fd)
 
         def new_intr_conn(ssock, ip_type):
@@ -166,7 +166,7 @@ def loop():
 
     opts = {
         "PSM": GLib.Variant.new_uint16(PSM_CTRL),
-        "ServiceRecord": GLib.Variant.new_string(open('./sdp_record.xml', 'r').read()),
+        "ServiceRecord": GLib.Variant.new_string(open('sdp_record.xml', 'r').read()),
         "RequireAuthentication": GLib.Variant.new_boolean(True),
         "RequireAuthorization": GLib.Variant.new_boolean(False),
     }

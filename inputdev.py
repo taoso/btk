@@ -138,7 +138,7 @@ class Keyboard(Device):
             # Get the hex keycode of the key
             hex_key = keymap.convert(ev.ecodes.KEY[event.code])
             # Loop through elements 4 to 9 of the input report structure
-            for i in range (4, 10):
+            for i in range(4, 10):
                 if self.state[i] == hex_key and event.value == 0:
                     # Code is 0 so we need to depress it
                     self.state[i] = 0x00

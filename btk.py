@@ -2,19 +2,20 @@
 
 from __future__ import print_function
 
-from gi.repository import GLib, Gio
-from pydbus import SessionBus, SystemBus
-from dbus import Server
-
-import os
-import sys
-import bluetooth as bt
-import uuid
-import time
+import errno
 import glob
-from inputdev import Keyboard, Mouse
-
+import os
 import struct
+import sys
+import time
+import uuid
+
+from gi.repository import GLib
+from pydbus import SystemBus
+import bluetooth as bt
+
+from dbus import Server
+from inputdev import Keyboard, Mouse
 
 keyboard_dev_paths = glob.glob('/dev/input/by-path/*event-kbd')
 mouse_dev_paths = glob.glob('/dev/input/by-path/*event-mouse')
@@ -70,14 +71,14 @@ class HIDConnection:
 
         handshake = HIDP_TRANS_HANDSHAKE
         if data.__class__ == str:
-            print('Received' + data.__repr__())
+            print('Received ' + data.__repr__())
             if data[0] == '\x03':
                 print('set protocol')
                 handshake |= HIDP_HSHK_SUCCESSFUL
                 os.write(fd, str(handshake))
                 return True
 
-        msg_type = data[0] & HIDP_HEADER_TRANS_MASK
+        msg_type = ord(data[0]) & HIDP_HEADER_TRANS_MASK
 
         if msg_type & HIDP_TRANS_SET_PROTOCOL:
             print('set protocol')
@@ -94,7 +95,7 @@ class HIDConnection:
         os.write(fd, struct.pack("b", handshake))
         return True
 
-    def register_intr_sock(self, sock):
+    def register_intr_socks(self, sock):
         self.hello()
         self.intr_sock = sock
         mouse.register_intr_sock(self.intr_sock)
@@ -131,17 +132,17 @@ class HIDProfile(Server):
         self.quit()
 
     def RequestDisconnection(self, device):
-        print('RequestDisconnection')
-        conns.pop(device).close()
+        print('RequestDisconnection (%s)' % device)
+        self.conns.pop(device).close()
 
     def NewConnection(self, device, fd, fd_properties):
-        print("new control connectin")
+        print("New control connection (%s, %d, %s)" % (device, fd, fd_properties))
         self.conns[device] = HIDConnection(fd)
 
         def new_intr_conn(ssock, ip_type):
             sock, info = ssock.accept()
-            print("interrput connection:", info)
-            self.conns[device].register_intr_sock(sock)
+            print("interrupt connection:", info)
+            self.conns[device].register_intr_socks(sock)
             return False
 
         GLib.io_add_watch(self.sock, GLib.IO_IN, new_intr_conn)
@@ -165,7 +166,7 @@ def loop():
 
     opts = {
         "PSM": GLib.Variant.new_uint16(PSM_CTRL),
-        "ServiceRecord": GLib.Variant.new_string(open('./sdp_record.xml', 'r').read()),
+        "ServiceRecord": GLib.Variant.new_string(open('sdp_record.xml', 'r').read()),
         "RequireAuthentication": GLib.Variant.new_boolean(True),
         "RequireAuthorization": GLib.Variant.new_boolean(False),
     }

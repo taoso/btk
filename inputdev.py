@@ -1,3 +1,5 @@
+import struct
+
 try:
     from gi.repository import GObject as gobject
 except ImportError:
@@ -5,8 +7,6 @@ except ImportError:
 
 import evdev as ev
 import keymap
-import os
-import struct
 
 class Device:
     def __init__(self, dev_paths, report_id):
@@ -138,7 +138,7 @@ class Keyboard(Device):
             # Get the hex keycode of the key
             hex_key = keymap.convert(ev.ecodes.KEY[event.code])
             # Loop through elements 4 to 9 of the input report structure
-            for i in range (4, 10):
+            for i in range(4, 10):
                 if self.state[i] == hex_key and event.value == 0:
                     # Code is 0 so we need to depress it
                     self.state[i] = 0x00

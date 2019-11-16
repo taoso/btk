@@ -15,7 +15,11 @@ class Server(object):
         self.method_inargs = method_inargs
         self.method_outargs = method_outargs
 
-        bus.register_object(object_path=path, interface_info=interface_info, method_call_closure=self.on_method_call)
+        # Help on method register_object in module pydbus.registration:
+        # register_object(self, path, object, node_info) method of pydbus.bus.Bus instance
+            
+        bus.register_object(path, self, self.__doc__)
+        # bus.publish(path,self)
 
     def run(self):
         self.loop.run()
@@ -68,9 +72,9 @@ class Foo(Server):
 
 
 if __name__ == '__main__':
-    from pydbus import SessionBus
-    bus = SessionBus()
+    from pydbus import SystemBus
+    bus = SystemBus()
     bus.own_name(name = 'net.lvht')
 
-    foo = Foo(bus=bus.con, path='/net/lvht/Foo')
+    foo = Foo(bus=bus, path='/net/lvht/Foo')
     foo.run()
